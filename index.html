@@ -844,7 +844,7 @@ const BOXY_FOLDS=[["M 470 395 C 440 430 420 455 400 490",22,.12],["M 130 395 C 1
 const BOXY_LIGHTS=[["M 300 175 C 300 320 300 460 300 580",130,.06],["M 235 200 C 230 330 233 460 238 580",26,.07],["M 368 210 C 374 330 371 460 366 580",22,.06]];
 const BOXY_PA={front:{x:200,y:175,w:200,h:270},back:{x:200,y:150,w:200,h:280}};
 const STYLES={
-  classica:{label:"T-shirt boxy",cm:34,...BOXY_NECK,
+  classica:{label:"T-shirt boxy",cm:34,...BOXY_NECK,torso:{x1:128,x2:472,armY:380},sleeve:[[125,250],[76,354]],
     rest:`${BOXY_SHOULDER_R} C 506 150 546 230 576 329 L 473 380 ${BOXY_BODY_R} L 128 380 L 25 329 C 55 230 95 150 122 140 ${BOXY_SHOULDER_L}`,
     seams:BOXY_SEAMS,
     hems:["M 571 318 L 468 369","M 30 318 L 133 369","M 132 590 C 200 593 400 593 469 590"],
@@ -853,7 +853,7 @@ const STYLES={
     pa:BOXY_PA},
   /* ricalcata dalla foto della versione a maniche lunghe: corpo corto e squadrato, spalle molto scese,
      maniche larghe e dritte che scendono oltre l'orlo, polsini e orlo a costina */
-  manicalunga:{label:"Manica lunga",cm:38,L:[236,100],R:[358,100],back:[252,111,342,111],front:[250,172,344,172],rib:15,
+  manicalunga:{label:"Manica lunga",cm:38,torso:{x1:149,x2:451,armY:313},sleeve:[[143,255],[53,574]],L:[236,100],R:[358,100],back:[252,111,342,111],front:[250,172,344,172],rib:15,
     rest:"C 395 118 440 170 462 210 C 470 214 474 220 476 228 L 589 560 L 504 588 L 451 313 L 451 557 C 400 559 200 559 149 557 L 149 313 L 96 588 L 11 560 L 124 228 C 126 220 130 214 138 210 C 160 170 205 118 236 100 Z",
     seams:["M 460 212 C 457 250 454 285 451 313","M 140 212 C 143 250 146 285 149 313"],
     hems:["M 585 548 L 500 576","M 15 548 L 100 576","M 152 544 C 200 546 400 546 448 544"],
@@ -1011,6 +1011,8 @@ const SHAPES=[
 /* ---------- modelli di partenza ---------- */
 const T=(text,o)=>new fabric.IText(text,Object.assign({textAlign:"center",name:"Testo",fill:"#16171c"},o));
 const STARTERS=[
+  {k:"boxy",name:"T-shirt boxy",style:"classica",color:"#1d1d20",colorName:"Nero",fabric:"heavy",technique:"Serigrafia",fonts:[],build:()=>({front:[],back:[]})},
+  {k:"lunga",name:"Manica lunga",style:"manicalunga",color:"#1d1d20",colorName:"Nero",fabric:"heavy",technique:"Serigrafia",fonts:[],build:()=>({front:[],back:[]})},
   {k:"audace",name:"Scritta audace",style:"classica",color:"#f4f4f1",colorName:"Bianco",fabric:"cotone",technique:"Serigrafia",fonts:["Anton","Inter"],build:pa=>({front:[
     at(T("NOME\nBRAND",{fontFamily:"Anton",fontSize:78,lineHeight:.9}),pa,.5,.3),
     at(T("COLLEZIONE 2026",{fontFamily:"Inter",fontWeight:"bold",fontSize:14,charSpacing:420}),pa,.5,.56)],back:[]})},
@@ -1388,28 +1390,51 @@ function shirtGeometry(style){
   mx.setTransform(1/R,0,0,1/R,0,0); mx.fill(P.body); const A=mx.getImageData(0,0,GW,GH).data;
   mx.setTransform(1,0,0,1,0,0); mx.clearRect(0,0,GW,GH); mx.setTransform(1/R,0,0,1/R,0,0); mx.fill(P.inner); const B=mx.getImageData(0,0,GW,GH).data;
   const ins=new Uint8Array(N), inn=new Uint8Array(N); for(let i=0;i<N;i++){ ins[i]=A[i*4+3]>127?1:0; inn[i]=B[i*4+3]>127?1:0; }
+  // distanza dal bordo (serve per chiudere fianchi e spalle)
   const D=new Float32Array(N); for(let i=0;i<N;i++) D[i]=ins[i]?1e6:0;
   const g=(x,y)=>(x<0||y<0||x>=GW||y>=GH)?0:D[y*GW+x];
   for(let y=0;y<GH;y++) for(let x=0;x<GW;x++){ const i=y*GW+x; if(D[i]) D[i]=Math.min(D[i],g(x-1,y)+1,g(x,y-1)+1,g(x-1,y-1)+1.414,g(x+1,y-1)+1.414); }
   for(let y=GH-1;y>=0;y--) for(let x=GW-1;x>=0;x--){ const i=y*GW+x; if(D[i]) D[i]=Math.min(D[i],g(x+1,y)+1,g(x,y+1)+1,g(x+1,y+1)+1.414,g(x-1,y+1)+1.414); }
-  let dmax=2; for(let i=0;i<N;i++) if(D[i]>dmax) dmax=D[i];
-  const depth=80; let Z=new Float32Array(N);
-  for(let i=0;i<N;i++) Z[i]=ins[i]?depth*Math.pow(Math.max(0,D[i]-1)/(dmax-1),.55):0;
-  // ammorbidisce la superficie: niente creste né gradini
-  for(let pass=0;pass<10;pass++){ const nz=new Float32Array(N);
-    for(let y=0;y<GH;y++) for(let x=0;x<GW;x++){ const i=y*GW+x; if(!ins[i]) continue; let s=0,n=0;
-      for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){ const xx=x+dx, yy=y+dy; if(xx<0||yy<0||xx>=GW||yy>=GH){ n++; continue; } s+=Z[yy*GW+xx]; n++; }
-      nz[i]=D[i]<=1.01?0:s/n; }
-    Z=nz; }
+  const T=st.torso||{x1:128,x2:472,armY:380}, cx=(T.x1+T.x2)/2, W=(T.x2-T.x1)/2, Dt=W*.42, PW=2.6;
+  const topY=new Int32Array(GW).fill(GH); for(let x=0;x<GW;x++) for(let y=0;y<GH;y++) if(ins[y*GW+x]){ topY[x]=y; break; }
+  const sm=(e0,e1,v)=>{ const t=Math.max(0,Math.min(1,(v-e0)/(e1-e0))); return t*t*(3-2*t); };
+  // maniche: asse dalla spalla al polsino, larghezza misurata dalla sagoma
+  const ax0=st.sleeve||[[125,250],[76,354]], NB=48;
+  const sl=[ax0, ax0.map(([x,y])=>[600-x,y])].map(([[ax,ay],[bx,by]])=>{ const dx=bx-ax, dy=by-ay, L=Math.hypot(dx,dy); return {ax,ay,ux:dx/L,uy:dy/L,nx:-dy/L,ny:dx/L,L,mn:new Float32Array(NB).fill(1e9),mx:new Float32Array(NB).fill(-1e9)}; });
+  const proj=(s0,px,py)=>{ const t=((px-s0.ax)*s0.ux+(py-s0.ay)*s0.uy)/s0.L; return {t,b:Math.max(0,Math.min(NB-1,Math.floor(t*NB))),q:(px-s0.ax)*s0.nx+(py-s0.ay)*s0.ny}; };
+  for(let y=0;y<GH;y++) for(let x=0;x<GW;x++){ const i=y*GW+x; if(!ins[i]) continue; const px=(x+.5)*R, py=(y+.5)*R; if(px>=T.x1&&px<=T.x2) continue;
+    const s0=sl[px<cx?0:1], p=proj(s0,px,py); if(p.t<0||p.t>1.05) continue; s0.mn[p.b]=Math.min(s0.mn[p.b],p.q); s0.mx[p.b]=Math.max(s0.mx[p.b],p.q); }
+  for(const s0 of sl){ // riempie i tratti vuoti e ammorbidisce
+    let last=-1; for(let k=0;k<NB;k++){ if(s0.mx[k]>s0.mn[k]) last=k; else if(last>=0){ s0.mn[k]=s0.mn[last]; s0.mx[k]=s0.mx[last]; } }
+    let first=-1; for(let k=NB-1;k>=0;k--){ if(s0.mx[k]>s0.mn[k]) first=k; else if(first>=0){ s0.mn[k]=s0.mn[first]; s0.mx[k]=s0.mx[first]; } }
+    const a1=Float32Array.from(s0.mn), a2=Float32Array.from(s0.mx);
+    for(let k=0;k<NB;k++){ let u=0,v=0,n=0; for(let j=-2;j<=2;j++){ const kk=Math.max(0,Math.min(NB-1,k+j)); u+=a1[kk]; v+=a2[kk]; n++; } s0.mn[k]=u/n; s0.mx[k]=v/n; } }
+  const tube=(side,px,py)=>{ const s0=sl[side], p=proj(s0,px,py); const c=(s0.mn[p.b]+s0.mx[p.b])/2, hw=Math.max(4,(s0.mx[p.b]-s0.mn[p.b])/2); const u=(p.q-c)/hw;
+    return {z:Math.abs(u)>=1?0:hw*.78*Math.sqrt(1-u*u),t:p.t}; };
+  const Z=new Float32Array(N);
+  for(let y=0;y<GH;y++) for(let x=0;x<GW;x++){ const i=y*GW+x; if(!ins[i]) continue; const px=(x+.5)*R, py=(y+.5)*R, side=px<cx?0:1;
+    const below=y+1<GH?ins[i+GW]:0; let z, openEdge=false;
+    if(px>=T.x1&&px<=T.x2){ // busto: sezione ovale, spalle che si chiudono, orlo aperto
+      const u=Math.min(1,Math.abs(px-cx)/W); const dTop=(y-topY[x])*R;
+      z=Dt*Math.pow(Math.max(0,1-Math.pow(u,PW)),1/PW)*sm(0,28,dTop);
+      z+=Math.sin(px*.05+py*.012)*2.2*sm(T.armY,SH,py)*(1-u); // leggero panneggio in basso
+      if(py<T.armY+24){ const w=Math.exp(-(W-Math.abs(px-cx))/26); z=Math.max(z,tube(side,px,py).z*w*sm(0,20,dTop)); }
+      if(!below&&py>T.armY) openEdge=true;
+    } else { const tb=tube(side,px,py); z=tb.z; if(tb.t>.86) openEdge=true; }
+    if(D[i]<=1.01&&!openEdge) z=0;
+    Z[i]=z; }
+  for(let pass=0;pass<3;pass++){ const nz=Float32Array.from(Z); // ammorbidisce le giunture
+    for(let y=1;y<GH-1;y++) for(let x=1;x<GW-1;x++){ const i=y*GW+x; if(!ins[i]||Z[i]===0) continue; let s=0,n=0;
+      for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){ const j=i+dy*GW+dx; if(ins[j]){ s+=Z[j]; n++; } } nz[i]=s/n; }
+    for(let i=0;i<N;i++) if(Z[i]!==0) Z[i]=nz[i]; }
   const pos=[], uv=[], F=new Int32Array(N).fill(-1), Bk=new Int32Array(N).fill(-1);
-  for(let y=0;y<GH;y++) for(let x=0;x<GW;x++){ const i=y*GW+x; if(!ins[i]) continue;
-    const px=(x+.5)*R, py=(y+.5)*R, z=Z[i];
-    const wob=Math.sin(py*.045+px*.01)*z*.04; // leggere ondulazioni del tessuto
-    F[i]=pos.length/3; pos.push(px-300,-(py-350),inn[i]?-z*.55:z+wob); uv.push(px/SW,1-py/SH);
-    Bk[i]=pos.length/3; pos.push(px-300,-(py-350),-z-wob); uv.push(1-px/SW,1-py/SH); }
+  for(let y=0;y<GH;y++) for(let x=0;x<GW;x++){ const i=y*GW+x; if(!ins[i]) continue; const px=(x+.5)*R, py=(y+.5)*R, z=Z[i];
+    F[i]=pos.length/3; pos.push(px-300,-(py-350),z); uv.push(px/SW,1-py/SH);
+    Bk[i]=pos.length/3; pos.push(px-300,-(py-350),-z); uv.push(1-px/SW,1-py/SH); }
   const fr=[], bk=[];
   for(let y=0;y<GH-1;y++) for(let x=0;x<GW-1;x++){ const i=y*GW+x, j=i+1, k=i+GW, l=k+1; if(!(ins[i]&&ins[j]&&ins[k]&&ins[l])) continue;
-    fr.push(F[i],F[k],F[j],F[j],F[k],F[l]); bk.push(Bk[i],Bk[j],Bk[k],Bk[j],Bk[l],Bk[k]); }
+    if(!(inn[i]||inn[j]||inn[k]||inn[l])) fr.push(F[i],F[k],F[j],F[j],F[k],F[l]); // lo scollo davanti resta aperto
+    bk.push(Bk[i],Bk[j],Bk[k],Bk[j],Bk[l],Bk[k]); }
   const geo=new THREE.BufferGeometry(); geo.setAttribute("position",new THREE.Float32BufferAttribute(pos,3)); geo.setAttribute("uv",new THREE.Float32BufferAttribute(uv,2));
   geo.setIndex(fr.concat(bk)); geo.addGroup(0,fr.length,0); geo.addGroup(fr.length,bk.length,1); geo.computeVertexNormals(); return geo; }
 function loadImg(src){ return new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=rej; im.src=src; }); }
@@ -1443,9 +1468,11 @@ async function open3D(spec){
   const key=new THREE.DirectionalLight(0xffffff,.62); key.position.set(450,650,1000); scene.add(key);
   const rim=new THREE.DirectionalLight(0xffffff,.28); rim.position.set(-600,300,-900); scene.add(rim);
   const geo=shirtGeometry(spec.style); const tf=shirtTexture(fImg,spec.style,spec.color), tb=shirtTexture(bImg,spec.style,spec.color);
-  const mats=[new THREE.MeshStandardMaterial({map:tf,roughness:(FABRICS[spec.fabric]||FABRICS.cotone).rough,metalness:0,side:THREE.DoubleSide}),new THREE.MeshStandardMaterial({map:tb,roughness:(FABRICS[spec.fabric]||FABRICS.cotone).rough,metalness:0,side:THREE.DoubleSide})];
+  const mats=[new THREE.MeshStandardMaterial({map:tf,roughness:(FABRICS[spec.fabric]||FABRICS.cotone).rough,metalness:0,side:THREE.FrontSide}),new THREE.MeshStandardMaterial({map:tb,roughness:(FABRICS[spec.fabric]||FABRICS.cotone).rough,metalness:0,side:THREE.FrontSide})];
   disposables.push(geo,tf,tb,...mats);
   const shirt=new THREE.Mesh(geo,mats); const grp=new THREE.Group(); grp.add(shirt); scene.add(grp);
+  const innerMat=new THREE.MeshStandardMaterial({color:new THREE.Color(shade(spec.color,isDark(spec.color)?.06:-.32)),roughness:1,metalness:0,side:THREE.BackSide}); disposables.push(innerMat);
+  grp.add(new THREE.Mesh(geo,innerMat));
   const sc=document.createElement("canvas"); sc.width=sc.height=256; const sx=sc.getContext("2d"); const rg=sx.createRadialGradient(128,128,10,128,128,128); rg.addColorStop(0,"rgba(0,0,0,.35)"); rg.addColorStop(1,"rgba(0,0,0,0)"); sx.fillStyle=rg; sx.fillRect(0,0,256,256);
   const st=new THREE.CanvasTexture(sc); const sm=new THREE.MeshBasicMaterial({map:st,transparent:true,depthWrite:false}); const sg=new THREE.PlaneGeometry(560,170);
   const floor=new THREE.Mesh(sg,sm); floor.rotation.x=-Math.PI/2; floor.position.y=-385; scene.add(floor); disposables.push(st,sm,sg);
