@@ -22,5 +22,15 @@ http.createServer((req, res) => {
     });
     return;
   }
+  // foto di riferimento (cartella ref/, non pubblicata): servono per ricalcare le sagome
+  const ref = url.match(/^\/ref\/([\w.-]+\.(jpe?g|png))$/i);
+  if (ref) {
+    fs.readFile(path.join(__dirname, "ref", ref[1]), (err, buf) => {
+      if (err) { res.writeHead(404); return res.end("Non trovato"); }
+      res.writeHead(200, { "Content-Type": /png$/i.test(ref[1]) ? "image/png" : "image/jpeg" });
+      res.end(buf);
+    });
+    return;
+  }
   res.writeHead(404); res.end("Non trovato");
 }).listen(PORT, "127.0.0.1", () => console.log(`Magazzino Magliette: http://localhost:${PORT}`));
