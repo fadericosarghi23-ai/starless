@@ -844,7 +844,7 @@ const BOXY_PA={front:{x:200,y:175,w:200,h:270},back:{x:200,y:150,w:200,h:280}};
 const STYLES={
   /* contorno misurato riga per riga sui pixel della foto di riferimento (scala 1,08) */
   classica:{label:"T-shirt boxy",cm:34,L:[239,97],R:[362,97],back:[262,102,339,102],front:[252,166,349,166],rib:17,
-    torso:{x1:128,x2:473,armY:388},sleeve:[[128,278],[79,362]],
+    torso:{x1:128,x2:473,armY:388},sleeve:[[128,278],[79,362]],cuff:[[30,337],[128,388]],
     rest:"L 371 103.5 L 384 110 L 398 116.4 L 413.4 122.9 L 429.6 129.4 L 443.6 135.9 L 458.7 142.4 L 470.6 148.8 L 481.4 155.3 L 487.9 161.8 L 491.1 168.3 L 495.4 174.8 L 500.8 187.7 L 513.8 213.6 L 526.8 239.6 L 541.9 272 L 558.1 304.4 L 570 330.3 L 571.1 336.8 L 559.2 343.2 L 518.2 362.7 L 479.3 382.1 L 473 388.6 L 473.5 607.8 L 127.5 607.8 L 128 388.6 L 121.7 382.1 L 82.8 362.7 L 41.8 343.2 L 29.9 336.8 L 31 330.3 L 42.9 304.4 L 59.1 272 L 74.2 239.6 L 87.2 213.6 L 100.2 187.7 L 105.6 174.8 L 109.9 168.3 L 113.1 161.8 L 119.6 155.3 L 130.4 148.8 L 142.3 142.4 L 157.4 135.9 L 171.4 129.4 L 187.6 122.9 L 202.8 116.4 L 216.8 110 L 229.8 103.5 L 239 97 Z",
     seams:["M 473 168 C 473 250 473 320 473 388","M 128 168 C 128 250 128 320 128 388"],
     hems:["M 566 327 L 468 378","M 35 327 L 133 378","M 131 595 C 200 596 400 596 470 595"],
@@ -853,7 +853,7 @@ const STYLES={
     pa:BOXY_PA},
   /* ricalcata dalla foto della versione a maniche lunghe: corpo corto e squadrato, spalle molto scese,
      maniche larghe e dritte che scendono oltre l'orlo, polsini e orlo a costina */
-  manicalunga:{label:"Manica lunga",cm:38,torso:{x1:149,x2:451,armY:435},sleeve:[[143,322],[53,574]],L:[236,100],R:[358,100],back:[252,111,342,111],front:[250,172,344,172],rib:15,
+  manicalunga:{label:"Manica lunga",cm:38,torso:{x1:149,x2:451,armY:435},sleeve:[[143,322],[53,574]],cuff:[[11,560],[96,588]],L:[236,100],R:[358,100],back:[252,111,342,111],front:[250,172,344,172],rib:15,
     rest:"C 395 118 440 170 462 210 C 470 214 474 220 476 228 L 589 560 L 504 588 L 451 435 L 451 557 C 400 559 200 559 149 557 L 149 435 L 96 588 L 11 560 L 124 228 C 126 220 130 214 138 210 C 160 170 205 118 236 100 Z",
     seams:["M 460 212 C 456 290 453 370 451 435","M 140 212 C 144 290 147 370 149 435"],
     hems:["M 585 548 L 500 576","M 15 548 L 100 576","M 152 544 C 200 546 400 546 448 544"],
@@ -1410,7 +1410,7 @@ function shirtGeometry(style){
   const R=2, GW=Math.ceil(SW/R), GH=Math.ceil(SH/R);
   const mc=document.createElement("canvas"); mc.width=GW; mc.height=GH; const mx=mc.getContext("2d"); mx.setTransform(1/R,0,0,1/R,0,0); mx.fill(P.body);
   const A=mx.getImageData(0,0,GW,GH).data; const inside=(px,py)=>{ const x=Math.floor(px/R), y=Math.floor(py/R); return x>=0&&y>=0&&x<GW&&y<GH&&A[(y*GW+x)*4+3]>127; };
-  const T=st.torso||{x1:128,x2:473,armY:388}, cx=(T.x1+T.x2)/2, W=(T.x2-T.x1)/2, B=W*.4, PE=2.7;
+  const T=st.torso||{x1:128,x2:473,armY:388}, cx=(T.x1+T.x2)/2, W=(T.x2-T.x1)/2, B=W*.46, PE=2.7;
   const sm=(e0,e1,v)=>{ const t=Math.max(0,Math.min(1,(v-e0)/(e1-e0))); return t*t*(3-2*t); };
   const se=(c,p)=>Math.sign(c)*Math.pow(Math.abs(c),2/p);
   const topArr=new Float32Array(SW+1), botArr=new Float32Array(SW+1);
@@ -1423,7 +1423,17 @@ function shirtGeometry(style){
   const frontNeckY=curveY(st.front), backNeckY=curveY(st.back);
   const nL=st.L[0], nR=st.R[0], nC=(nL+nR)/2, nH=(nR-nL)/2;
   const topAt=(x,front)=>(x>nL&&x<nR)?(front?frontNeckY(x):backNeckY(x)):colTop(x);
-  const pinchAt=x=>{ const d=Math.abs(x-nC); return d>=nH?1:sm(nH*.3,nH,d); }; // 1 = spalla cucita, 0 = scollo aperto
+  const pinchAt=x=>{ const d=Math.abs(x-nC); return d>=nH?1:.42+.58*sm(nH*.3,nH,d); }; // 1 = spalla cucita, 0 = scollo aperto
+  // pieghe del tessuto: creste morbide lungo un segmento
+  const ridge=(px,py,x1,y1,x2,y2,w,amp)=>{ const dx=x2-x1, dy=y2-y1, t=((px-x1)*dx+(py-y1)*dy)/(dx*dx+dy*dy); if(t<0||t>1) return 0;
+    const d=Math.hypot(px-(x1+dx*t),py-(y1+dy*t)); return amp*Math.exp(-(d*d)/(w*w))*Math.sin(Math.PI*t); };
+  const clothFolds=(x,y,hem)=>{ let f=0;
+    f+=ridge(x,y,T.x1+8,T.armY+6,cx-70,T.armY+125,10,5.5)+ridge(x,y,T.x2-8,T.armY+6,cx+70,T.armY+125,10,5.5);   // dal sottomanica
+    f-=ridge(x,y,T.x1+16,T.armY+26,cx-48,T.armY+155,7,3.2)+ridge(x,y,T.x2-16,T.armY+26,cx+48,T.armY+155,7,3.2);
+    f+=Math.sin(x*.06+Math.sin(y*.02)*1.2)*3.4*sm(T.armY+30,hem,y);   // drappeggio verticale in basso
+    f+=Math.sin(x*.11+1.3)*2.4*sm(hem-30,hem,y);                       // onda sull'orlo
+    f+=ridge(x,y,cx-34,T.armY-70,cx-24,T.armY+40,16,2.6)+ridge(x,y,cx+40,T.armY-60,cx+28,T.armY+50,14,2.2); // morbidezza sul petto
+    return f; };
   const pos=[], uv=[], groups=[[],[]];
   function patch(nu,nv,fn,front,outward){
     const base=pos.length/3;
@@ -1438,32 +1448,35 @@ function shirtGeometry(style){
     groups[front?0:1].push(...tris); }
   // busto: tubo a sezione arrotondata, spalle chiuse, scollo e orlo aperti
   for(const front of [true,false]){
-    const at=(a,b)=>{ const th=(front?0:Math.PI)+a*Math.PI, xr=se(Math.cos(th),PE), zr=se(Math.sin(th),PE);
-      const x=cx+W*xr, top=topAt(x,front), hem=colBot(x), y=top+(hem-top)*b, dTop=y-top, pin=pinchAt(x);
-      let z=B*zr*(1-pin*(1-Math.sqrt(sm(0,70,dTop))));
-      z+=Math.sign(zr||1)*Math.sin(x*.045+y*.008)*2.4*sm(T.armY,hem,y)*(1-Math.abs(xr)); // panneggio leggero in basso
-      return {p:[x,y,z],t:[cx+(x-cx)*(W-3)/W,Math.min(y,hem-1)],xr,zr}; };
+    // sezione a lente (sottile, fianchi che si stringono) come nel modello Hyper3D
+    const at=(a,b)=>{ const th=(front?0:Math.PI)+a*Math.PI, xr=Math.cos(th), sn=Math.sin(th), zr=Math.sign(sn)*Math.pow(Math.abs(sn),.92);
+      const x0=cx+W*xr, top=topAt(x0,front), hem=colBot(x0), y=top+(hem-top)*b, dTop=y-top, pin=pinchAt(x0), low=sm(T.armY,hem,y);
+      let z=B*zr*(1-pin*(1-Math.sqrt(sm(0,70,dTop))))*(1-.06*low);
+      z+=(front?1:-1)*clothFolds(x0,y,hem)*Math.abs(sn)*sm(0,30,dTop);
+      const x=x0+(x0-cx)*.035*low; // l'orlo si apre un poco
+      return {p:[x,y,z],t:[cx+(x0-cx)*(W-3)/W,Math.min(y,hem-1)],xr,zr}; };
     patch(84,80,(a,b)=>at(a,b),front,(a,b)=>{ const r=at(a,b); return [r.xr,0,r.zr]; });
   }
-  // maniche: tubi lungo l'asse spalla → polsino, larghezza misurata sulla sagoma
-  const ax0=st.sleeve||[[128,278],[79,362]], NB=40;
+  // maniche: raccordo dal giromanica (anello verticale sul fianco) all'orlo della manica (aperto)
+  const cuff0=st.cuff||[[30,337],[128,388]];
   for(const side of [0,1]){
-    const [[ax,ay],[bx,by]]=side?ax0.map(([x,y])=>[600-x,y]):ax0, dx=bx-ax, dy=by-ay, Lx=Math.hypot(dx,dy), ux=dx/Lx, uy=dy/Lx, nx=-uy, ny=ux;
-    const mn=new Float32Array(NB).fill(1e9), mxa=new Float32Array(NB).fill(-1e9); let tMax=0;
-    for(let y=0;y<SH;y+=2) for(let x=0;x<SW;x+=2){ if(!inside(x,y)) continue; if(x>=T.x1-1&&x<=T.x2+1) continue; if((x<cx)!==(side===0)) continue;
-      const t=((x-ax)*ux+(y-ay)*uy)/Lx; if(t<0||t>1.4) continue; const q=(x-ax)*nx+(y-ay)*ny, b=Math.min(NB-1,Math.floor(Math.min(t,.999)*NB));
-      mn[b]=Math.min(mn[b],q); mxa[b]=Math.max(mxa[b],q); tMax=Math.max(tMax,t); }
-    let last=-1; for(let k=0;k<NB;k++){ if(mxa[k]>mn[k]) last=k; else if(last>=0){ mn[k]=mn[last]; mxa[k]=mxa[last]; } }
-    let first=-1; for(let k=NB-1;k>=0;k--){ if(mxa[k]>mn[k]) first=k; else if(first>=0){ mn[k]=mn[first]; mxa[k]=mxa[first]; } }
-    const C=new Float32Array(NB), HW=new Float32Array(NB);
-    for(let k=0;k<NB;k++){ let c=0,h=0,n=0; for(let j=-2;j<=2;j++){ const kk=Math.max(0,Math.min(NB-1,k+j)); c+=(mn[kk]+mxa[kk])/2; h+=(mxa[kk]-mn[kk])/2; n++; } C[k]=c/n; HW[k]=Math.max(6,h/n); }
-    const sEnd=Math.min(1.35,Math.max(.9,tMax));
+    const mir=p=>side?[600-p[0],p[1]]:p, sg=side?1:-1;
+    const xs=side?T.x2-14:T.x1+14, rootTop=colTop(side?T.x2-2:T.x1+2), rootBot=T.armY;
+    const r0={c:[xs,(rootTop+rootBot)/2],n:[0,1],h:(rootBot-rootTop)/2};
+    const co=mir(cuff0[0]), ci=mir(cuff0[1]); let cn=[ci[0]-co[0],ci[1]-co[1]]; const cl=Math.hypot(cn[0],cn[1]); cn=[cn[0]/cl,cn[1]/cl];
+    if(cn[1]<0) cn=[-cn[0],-cn[1]]; // stesso verso dell'anello sul fianco (dall'alto in basso)
+    const r1={c:[(co[0]+ci[0])/2,(co[1]+ci[1])/2],n:cn,h:cl/2};
+    const u0=Math.min(.999,(W-14)/W), rootD=B*Math.sqrt(1-u0*u0)*1.08, cuffD=r1.h*.58;
     for(const front of [true,false]){
-      const at=(a,b)=>{ const s0=-.22+a*(sEnd+.22), k=Math.min(NB-1,Math.max(0,Math.floor(Math.min(s0,.999)*NB))), c=C[k], hw=HW[k];
-        const ph=(front?0:Math.PI)+b*Math.PI, cp=se(Math.cos(ph),2.3), sp=se(Math.sin(ph),2.3), hd=B*.5+(hw*.5-B*.5)*sm(0,.45,s0);
-        const along=s0*Lx, q=c+hw*cp, qt=c+(hw-3)*cp;
-        return {p:[ax+ux*along+nx*q,ay+uy*along+ny*q,hd*sp],t:[ax+ux*along+nx*qt,ay+uy*along+ny*qt],ctr:[ax+ux*along+nx*c,ay+uy*along+ny*c]}; };
-      patch(56,40,at,front,(a,b)=>{ const r=at(a,b); return [r.p[0]-r.ctr[0],-(r.p[1]-r.ctr[1]),r.p[2]]; });
+      const at=(a,b)=>{ const t=a, e=t*t*(3-2*t);
+        const c=[r0.c[0]+(r1.c[0]-r0.c[0])*t+sg*Math.sin(Math.PI*t)*6, r0.c[1]+(r1.c[1]-r0.c[1])*t];
+        let n=[r0.n[0]+(r1.n[0]-r0.n[0])*e, r0.n[1]+(r1.n[1]-r0.n[1])*e]; const nl=Math.hypot(n[0],n[1]); n=[n[0]/nl,n[1]/nl];
+        const h=r0.h+(r1.h-r0.h)*t, d=rootD+(cuffD-rootD)*e*(1-.15*Math.sin(Math.PI*t));
+        const ph=(front?0:Math.PI)+b*Math.PI, cp=Math.cos(ph), sp=Math.sin(ph);
+        const px=c[0]+n[0]*h*cp, py=c[1]+n[1]*h*cp, pt=[c[0]+n[0]*(h-3)*cp, c[1]+n[1]*(h-3)*cp];
+        const crease=Math.sin(Math.PI*t)*Math.sin(ph*2)*2.2; // piega leggera lungo la manica
+        return {p:[px,py,d*sp+crease*Math.sign(sp||1)],t:pt,c}; };
+      patch(36,48,at,front,(a,b)=>{ const r=at(a,b); return [r.p[0]-r.c[0],-(r.p[1]-r.c[1]),r.p[2]]; });
     }
   }
   const geo=new THREE.BufferGeometry(); geo.setAttribute("position",new THREE.Float32BufferAttribute(pos,3)); geo.setAttribute("uv",new THREE.Float32BufferAttribute(uv,2));
