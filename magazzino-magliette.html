@@ -341,6 +341,9 @@ input[type=range]{padding:0;border:0;background:none;accent-color:var(--accent)}
             <p class="note" id="edTechWarn" style="margin:0"></p>
             <h4>Cuciture</h4>
             <label class="chk"><input type="checkbox" id="edSeams" checked> Mostra cuciture e impunture</label>
+            <p class="note" id="edSeamsNote" style="margin:0" hidden>Nella foto realistica le cuciture fanno parte del tessuto: per toglierle scegli la resa Disegno.</p>
+            <h4>Resa del mockup</h4>
+            <div class="seg grid2" id="edRender"><button type="button" data-render="photo">Foto realistica</button><button type="button" data-render="draw">Disegno</button></div>
             <h4>Scorciatoie</h4>
             <div class="kbd"><kbd>Ctrl Z</kbd><span>Annulla</span><kbd>Ctrl Y</kbd><span>Ripeti</span><kbd>Ctrl D</kbd><span>Duplica</span><kbd>Ctrl C / V</kbd><span>Copia e incolla</span><kbd>Canc</kbd><span>Elimina</span><kbd>Frecce</kbd><span>Sposta di 1 px (Maiusc: 10)</span><kbd>Doppio clic</kbd><span>Modifica testo</span></div>
           </div>
@@ -843,7 +846,8 @@ const BOXY_LIGHTS=[["M 300 175 C 300 320 300 460 300 580",130,.06],["M 235 200 C
 const BOXY_PA={front:{x:200,y:175,w:200,h:270},back:{x:200,y:150,w:200,h:280}};
 const STYLES={
   /* contorno misurato riga per riga sui pixel della foto di riferimento (scala 1,08) */
-  classica:{label:"T-shirt boxy",cm:34,L:[239,97],R:[362,97],back:[262,102,339,102],front:[252,166,349,166],rib:17,
+  classica:{label:"T-shirt boxy",cm:34,photo:{front:"models/tee-front.webp",back:"models/tee-back.webp"},
+    photoGeo:{bodyD:"M 250 71 L 291 76 L 310 76 L 351 71 L 367 83 L 372 84 L 382 91 L 434 116 L 443 122 L 463 144 L 500 200 L 576 355 L 577 361 L 572 364 L 492 405 L 454 420 L 457 449 L 457 611 L 453 614 L 444 616 L 413 619 L 325 620 L 309 618 L 280 618 L 264 620 L 205 620 L 158 616 L 138 610 L 135 607 L 134 601 L 134 509 L 136 440 L 139 420 L 61 383 L 22 361 L 57 285 L 95 210 L 99 199 L 141 137 L 160 119 L 225 87 L 230 83 L 235 82 L 247 72 L 249 72 Z",L:[247,72],R:[354,72],back:[262,83,339,83],front:[258,135,343,135],torso:{x1:135,x2:457,armY:416},cuff:[[22,361],[139,420]],sleeve:[[135,280],[80,390]]},L:[239,97],R:[362,97],back:[262,102,339,102],front:[252,166,349,166],rib:17,
     torso:{x1:128,x2:473,armY:388},sleeve:[[128,278],[79,362]],cuff:[[30,337],[128,388]],
     rest:"L 371 103.5 L 384 110 L 398 116.4 L 413.4 122.9 L 429.6 129.4 L 443.6 135.9 L 458.7 142.4 L 470.6 148.8 L 481.4 155.3 L 487.9 161.8 L 491.1 168.3 L 495.4 174.8 L 500.8 187.7 L 513.8 213.6 L 526.8 239.6 L 541.9 272 L 558.1 304.4 L 570 330.3 L 571.1 336.8 L 559.2 343.2 L 518.2 362.7 L 479.3 382.1 L 473 388.6 L 473.5 607.8 L 127.5 607.8 L 128 388.6 L 121.7 382.1 L 82.8 362.7 L 41.8 343.2 L 29.9 336.8 L 31 330.3 L 42.9 304.4 L 59.1 272 L 74.2 239.6 L 87.2 213.6 L 100.2 187.7 L 105.6 174.8 L 109.9 168.3 L 113.1 161.8 L 119.6 155.3 L 130.4 148.8 L 142.3 142.4 L 157.4 135.9 L 171.4 129.4 L 187.6 122.9 L 202.8 116.4 L 216.8 110 L 229.8 103.5 L 239 97 Z",
     seams:["M 473 168 C 473 250 473 320 473 388","M 128 168 C 128 250 128 320 128 388"],
@@ -853,7 +857,8 @@ const STYLES={
     pa:BOXY_PA},
   /* ricalcata dalla foto della versione a maniche lunghe: corpo corto e squadrato, spalle molto scese,
      maniche larghe e dritte che scendono oltre l'orlo, polsini e orlo a costina */
-  manicalunga:{label:"Manica lunga",cm:38,torso:{x1:149,x2:451,armY:435},sleeve:[[143,322],[53,574]],cuff:[[11,560],[96,588]],L:[236,100],R:[358,100],back:[252,111,342,111],front:[250,172,344,172],rib:15,
+  manicalunga:{label:"Manica lunga",cm:38,photo:{front:"models/ls-front.webp",back:"models/ls-back.webp"},
+    photoGeo:{bodyD:"M 246 91 L 289 96 L 316 96 L 357 91 L 367 99 L 383 107 L 432 126 L 446 135 L 454 144 L 473 180 L 490 220 L 491 227 L 498 245 L 536 369 L 556 452 L 575 544 L 575 567 L 577 585 L 528 596 L 493 600 L 464 542 L 446 484 L 437 447 L 435 448 L 435 451 L 438 503 L 427 505 L 251 503 L 205 505 L 163 504 L 160 502 L 161 469 L 163 462 L 163 453 L 161 452 L 152 486 L 147 498 L 145 510 L 134 543 L 126 562 L 117 575 L 106 600 L 62 594 L 22 584 L 25 560 L 24 544 L 35 486 L 58 385 L 86 292 L 110 224 L 110 220 L 124 188 L 140 156 L 155 135 L 181 121 L 221 106 L 228 101 L 232 101 L 245 92 Z",L:[244,92],R:[358,92],back:[258,103,344,103],front:[256,156,346,156],torso:{x1:160,x2:438,armY:471},cuff:[[22,584],[106,600]],sleeve:[[160,301],[64,592]]},torso:{x1:149,x2:451,armY:435},sleeve:[[143,322],[53,574]],cuff:[[11,560],[96,588]],L:[236,100],R:[358,100],back:[252,111,342,111],front:[250,172,344,172],rib:15,
     rest:"C 395 118 440 170 462 210 C 470 214 474 220 476 228 L 589 560 L 504 588 L 451 435 L 451 557 C 400 559 200 559 149 557 L 149 435 L 96 588 L 11 560 L 124 228 C 126 220 130 214 138 210 C 160 170 205 118 236 100 Z",
     seams:["M 460 212 C 456 290 453 370 451 435","M 140 212 C 144 290 147 370 149 435"],
     hems:["M 585 548 L 500 576","M 15 548 L 100 576","M 152 544 C 200 546 400 546 448 544"],
@@ -874,10 +879,43 @@ function toHex(v){ if(typeof v!=="string"||!v) return "#000000"; if(/^#[0-9a-f]{
   try{ return "#"+new fabric.Color(v).toHex().toLowerCase(); }catch{ return "#000000"; } }
 
 /* ---------- mockup della maglietta ---------- */
+/* ---------- foto delle maglie: caricamento e resa ---------- */
+const PHOTOS={}; let photosP=null;
+const photoReady=sk=>!!(PHOTOS[sk+"|front"]&&PHOTOS[sk+"|back"]);
+function styleOf(sk,rm){ const st=STYLES[sk]||STYLES.classica; return (rm!=="draw"&&st.photoGeo&&photoReady(STYLES[sk]?sk:"classica"))?{...st,...st.photoGeo,isPhoto:true}:st; }
+function prepPhoto(im){ const c=document.createElement("canvas"); c.width=SW; c.height=SH; const x=c.getContext("2d"); x.drawImage(im,0,0,SW,SH);
+  const d=x.getImageData(0,0,SW,SH).data, N=SW*SH, L=new Float32Array(N), A=new Float32Array(N), vals=[];
+  for(let i=0;i<N;i++){ A[i]=d[i*4+3]/255; L[i]=d[i*4]/255; if(A[i]>.95&&i%5===0) vals.push(L[i]); }
+  vals.sort((a,b)=>a-b); return {L,A,ref:vals[Math.floor(vals.length*.82)]||.9}; }
+function loadPhotos(){ if(photosP) return photosP; const jobs=[];
+  for(const [sk,st] of Object.entries(STYLES)) if(st.photo) for(const side of ["front","back"]) jobs.push(new Promise(res=>{ const im=new Image();
+    im.onload=()=>{ try{ PHOTOS[sk+"|"+side]=prepPhoto(im); }catch(e){ console.warn(e); } res(); }; im.onerror=()=>res(); im.src=st.photo[side]; }));
+  return photosP=Promise.all(jobs).then(()=>{ shirtCache.clear(); }); }
+/* maglia dalla foto bianca: colore scelto + luci, ombre e trama applicate anche alle stampe */
+function photoLayers(sk,side,color,fk){
+  const ph=PHOTOS[sk+"|"+side], fab=FABRICS[fk]||FABRICS.cotone, [cr,cg,cb]=hexRgb(color).map(v=>v/255), lc=lum(color), N=SW*SH;
+  const mk=()=>{ const c=document.createElement("canvas"); c.width=SW; c.height=SH; return c; };
+  const sil=mk(), shirt=mk(), ov=mk(), sx=sil.getContext("2d"), hx=shirt.getContext("2d"), o=ov.getContext("2d");
+  const si=sx.createImageData(SW,SH), hi=hx.createImageData(SW,SH), oi=o.createImageData(SW,SH);
+  const darkAmt=Math.pow(1-Math.min(1,lc*1.8),2), hlK=fab.rough<.8?1.7:1;
+  for(let i=0;i<N;i++){ const a=ph.A[i], k=i*4, sv=ph.L[i]/ph.ref;
+    si.data[k+3]=a*255;
+    const hl=Math.max(0,sv-1)*1.5*hlK, lift=darkAmt*.2*Math.max(-.6,Math.min(1,(sv-.97)/.1));
+    hi.data[k]=255*Math.max(0,Math.min(1,cr+(1-cr)*hl+lift)); hi.data[k+1]=255*Math.max(0,Math.min(1,cg+(1-cg)*hl+lift)); hi.data[k+2]=255*Math.max(0,Math.min(1,cb+(1-cb)*hl+lift)); hi.data[k+3]=a*255;
+    const v=255*(1-a+a*Math.pow(Math.min(1,sv),1.35)); oi.data[k]=oi.data[k+1]=oi.data[k+2]=v; oi.data[k+3]=255; }
+  sx.putImageData(si,0,0); hx.putImageData(hi,0,0); o.putImageData(oi,0,0);
+  if(fab.tex.heather){ const n=Math.round(9000*fab.tex.heather); hx.save(); hx.globalCompositeOperation="source-atop";
+    for(let k=0;k<n;k++){ hx.fillStyle=Math.random()<.55?shade(color,.18+Math.random()*.2):shade(color,-.12-Math.random()*.12); hx.fillRect(Math.random()*SW,Math.random()*SH,2+Math.random()*4,1); } hx.restore(); }
+  const tp=mk(), tx=tp.getContext("2d"); tx.globalAlpha=.75; tx.fillStyle=tx.createPattern(fabricPattern(fk),"repeat"); tx.fillRect(0,0,SW,SH);
+  tx.globalAlpha=1; tx.globalCompositeOperation="destination-in"; tx.drawImage(sil,0,0);
+  o.globalCompositeOperation="multiply"; o.drawImage(tp,0,0);
+  const base=mk(), c=base.getContext("2d"), g=c.createRadialGradient(300,300,60,300,360,560); g.addColorStop(0,"#f4f4f6"); g.addColorStop(1,"#d3d3d9"); c.fillStyle=g; c.fillRect(0,0,SW,SH);
+  c.save(); c.shadowColor="rgba(0,0,0,.28)"; c.shadowBlur=34; c.shadowOffsetY=18; c.drawImage(sil,0,0); c.restore(); c.drawImage(shirt,0,0);
+  return {base,overlay:ov}; }
 function stylePaths(st){
   const [lx,ly]=st.L,[rx,ry]=st.R,b=st.back,f=st.front;
   const backC=`C ${b[0]} ${b[1]} ${b[2]} ${b[3]} ${rx} ${ry}`;
-  return { body:new Path2D(`${st.pre||`M ${lx} ${ly}`} ${backC} ${st.rest}`),
+  return { body:new Path2D(st.bodyD||`${st.pre||`M ${lx} ${ly}`} ${backC} ${st.rest}`),
     inner:new Path2D(`M ${lx} ${ly} ${backC} C ${f[2]} ${f[3]} ${f[0]} ${f[1]} ${lx} ${ly} Z`),
     frontNeck:new Path2D(`M ${lx} ${ly} C ${f[0]} ${f[1]} ${f[2]} ${f[3]} ${rx} ${ry}`),
     backNeck:new Path2D(`M ${lx} ${ly} ${backC}`) };
@@ -897,9 +935,10 @@ function fabricPattern(fk){
   if(f.heather){ for(let k=0;k<Math.round(240*f.heather);k++){ x.fillStyle=`rgba(0,0,0,${.05+Math.random()*.1})`; x.fillRect(Math.random()*P,Math.random()*P,2+Math.random()*5,1); } }
   return patCache[fk]=c; }
 const shirtCache=new Map();
-function shirtLayers(sk,side,color,fk,ns){
+function shirtLayers(sk,side,color,fk,ns,rm){
   fk=FABRICS[fk]?fk:"cotone"; const fab=FABRICS[fk];
-  const key=sk+"|"+side+"|"+color+"|"+fk+"|"+(ns?1:0); if(shirtCache.has(key)) return shirtCache.get(key);
+  const stE=styleOf(sk,rm), key=sk+"|"+side+"|"+color+"|"+fk+"|"+(ns?1:0)+"|"+(stE.isPhoto?"P":"D"); if(shirtCache.has(key)) return shirtCache.get(key);
+  if(stE.isPhoto){ const out=photoLayers(STYLES[sk]?sk:"classica",side,color,fk); shirtCache.set(key,out); return out; }
   if(shirtCache.size>24) shirtCache.clear();
   const st=STYLES[sk]||STYLES.classica, P=stylePaths(st), dark=isDark(color);
   const base=document.createElement("canvas"); base.width=SW; base.height=SH; const c=base.getContext("2d");
@@ -943,15 +982,15 @@ function shirtLayers(sk,side,color,fk,ns){
 
 /* ---------- utilità editor ---------- */
 const PROPS=["name","curve","warp","fx","sh","lockedLayer","lockMovementX","lockMovementY","lockScalingX","lockScalingY","lockRotation","hasControls"];
-const ED={canvas:null,open:false,side:"front",style:"classica",color:"#f4f4f1",colorName:"Bianco",fabric:"cotone",technique:"Serigrafia",noSeams:false,sides:{front:[],back:[]},templateId:null,createdAt:null,name:"",
+const ED={canvas:null,open:false,side:"front",style:"classica",color:"#f4f4f1",colorName:"Bianco",fabric:"cotone",technique:"Serigrafia",noSeams:false,render:"photo",sides:{front:[],back:[]},templateId:null,createdAt:null,name:"",
   hist:{front:{u:[],r:[]},back:{u:[],r:[]}},zoom:1,scale:1,dirty:false,loading:false,clip:null,keepRatio:true,lastW:0};
 const curPA=()=>STYLES[ED.style].pa[ED.side];
 const ppc=()=>curPA().w/STYLES[ED.style].cm;
 /* la grafica viene tagliata solo ai bordi della maglietta (niente area di stampa) */
-function bodyD(sk){ const st=STYLES[sk]||STYLES.classica, [lx,ly]=st.L, [rx,ry]=st.R, b=st.back; return `${st.pre||`M ${lx} ${ly}`} C ${b[0]} ${b[1]} ${b[2]} ${b[3]} ${rx} ${ry} ${st.rest}`; }
-const clipFor=sk=>new fabric.Path(bodyD(sk),{absolutePositioned:true,fill:"#000",stroke:null});
-function applyClipTo(objs,sk){ objs.forEach(o=>{ o.clipPath=clipFor(sk); if(o.type==="group") o.getObjects().forEach(ch=>ch.clipPath=null); o.dirty=true; }); }
-function applyClip(objs){ if(ED.canvas) applyClipTo(objs||ED.canvas.getObjects(),ED.style); }
+function bodyD(sk,rm){ const st=styleOf(sk,rm); if(st.bodyD) return st.bodyD; const [lx,ly]=st.L, [rx,ry]=st.R, b=st.back; return `${st.pre||`M ${lx} ${ly}`} C ${b[0]} ${b[1]} ${b[2]} ${b[3]} ${rx} ${ry} ${st.rest}`; }
+const clipFor=(sk,rm)=>new fabric.Path(bodyD(sk,rm),{absolutePositioned:true,fill:"#000",stroke:null});
+function applyClipTo(objs,sk,rm){ objs.forEach(o=>{ o.clipPath=clipFor(sk,rm); if(o.type==="group") o.getObjects().forEach(ch=>ch.clipPath=null); o.dirty=true; }); }
+function applyClip(objs){ if(ED.canvas) applyClipTo(objs||ED.canvas.getObjects(),ED.style,ED.render); }
 function inkDefault(){ return isDark(ED.color)?"#ffffff":"#16171c"; }
 const isText=o=>o&&/text/.test(o.type);
 function fontsIn(arr,set=new Set()){ for(const o of arr||[]){ if(o&&o.fontFamily) set.add(o.fontFamily); if(o&&o.objects) fontsIn(o.objects,set); } return set; }
@@ -1055,24 +1094,24 @@ const STARTERS=[
 async function buildStarter(s){
   await loadFabric(); await Promise.all(s.fonts.map(loadFont));
   const st=STYLES[s.style]; const r=s.build(st.pa.front,st.pa.back);
-  return {name:s.name,style:s.style,color:s.color,colorName:s.colorName,fabric:s.fabric||"cotone",technique:s.technique||"Serigrafia",front:r.front.map(o=>o.toObject(PROPS)),back:(r.back||[]).map(o=>o.toObject(PROPS))};
+  return {name:s.name,style:s.style,color:s.color,colorName:s.colorName,fabric:s.fabric||"cotone",technique:s.technique||"Serigrafia",render:"photo",front:r.front.map(o=>o.toObject(PROPS)),back:(r.back||[]).map(o=>o.toObject(PROPS))};
 }
 
 /* ---------- render di un lato (miniature, mockup, 3D) ---------- */
-async function renderMock(style,color,side,arr,width,format,fk,ns){
-  await loadFabric();
+async function renderMock(style,color,side,arr,width,format,fk,ns,rm){
+  await loadFabric(); await loadPhotos();
   const sc=new fabric.StaticCanvas(null,{width:SW,height:SH,enableRetinaScaling:false,renderOnAddRemove:false});
-  const L=shirtLayers(style,side,color,fk,ns);
+  const L=shirtLayers(style,side,color,fk,ns,rm);
   sc.backgroundImage=new fabric.Image(L.base); sc.overlayImage=new fabric.Image(L.overlay,{globalCompositeOperation:"multiply"});
   await loadFontsFor(arr); const objs=await enliven(arr); fixAfterLoad(objs);
-  applyClipTo(objs,style); objs.forEach(o=>sc.add(o));
+  applyClipTo(objs,style,rm); objs.forEach(o=>sc.add(o));
   sc.renderAll(); const url=sc.toDataURL({format:format||"jpeg",quality:.88,multiplier:width/SW}); sc.dispose(); return url;
 }
 
 /* ---------- galleria ---------- */
 const starterThumbs={}; let thumbsBusy=false;
 async function genStarterThumbs(){ if(thumbsBusy) return; thumbsBusy=true;
-  for(const s of STARTERS){ if(starterThumbs[s.k]) continue; try{ const sp=await buildStarter(s); starterThumbs[s.k]=await renderMock(sp.style,sp.color,"front",sp.front,320,null,sp.fabric,sp.noSeams); renderStudioGallery(); }catch(e){ console.warn(e); } }
+  for(const s of STARTERS){ if(starterThumbs[s.k]) continue; try{ const sp=await buildStarter(s); starterThumbs[s.k]=await renderMock(sp.style,sp.color,"front",sp.front,320,null,sp.fabric,sp.noSeams,sp.render); renderStudioGallery(); }catch(e){ console.warn(e); } }
   thumbsBusy=false; }
 const okThumb=u=>typeof u==="string"&&/^data:image\//.test(u);
 function tplCard(t,starter){
@@ -1095,7 +1134,7 @@ function renderStudioGallery(){
 function initCanvas(){
   if(ED.canvas) return;
   const c=ED.canvas=new fabric.Canvas("edCanvas",{width:SW,height:SH,preserveObjectStacking:true,stopContextMenu:true,allowTouchScrolling:true,selectionColor:"rgba(58,54,214,.08)",selectionBorderColor:"#3a36d6",selectionLineWidth:1});
-  c.on("object:added",e=>{ const o=e.target; if(!ED.loading&&!o.clipPath) o.clipPath=clipFor(ED.style); queueHist(); renderLayers(); });
+  c.on("object:added",e=>{ const o=e.target; if(!ED.loading&&!o.clipPath) o.clipPath=clipFor(ED.style,ED.render); queueHist(); renderLayers(); });
   c.on("object:removed",()=>{ queueHist(); renderLayers(); });
   c.on("object:modified",()=>{ queueHist(); renderLayers(); renderProps(); hideSnap(); });
   c.on("text:editing:exited",()=>{ queueHist(); renderLayers(); renderProps(); });
@@ -1135,7 +1174,7 @@ function snap(o){ const pa=curPA(), cx=pa.x+pa.w/2, cy=pa.y+pa.h/2, p=o.getCente
   if(sx||sy) o.setPositionByOrigin(p,"center","center"); $("#snapV").hidden=!sx; $("#snapH").hidden=!sy; }
 function hideSnap(){ $("#snapV").hidden=true; $("#snapH").hidden=true; }
 function applyShirt(){
-  const c=ED.canvas; if(!c) return; const L=shirtLayers(ED.style,ED.side,ED.color,ED.fabric,ED.noSeams);
+  const c=ED.canvas; if(!c) return; const L=shirtLayers(ED.style,ED.side,ED.color,ED.fabric,ED.noSeams,ED.render);
   c.backgroundImage=new fabric.Image(L.base,{excludeFromExport:true,selectable:false,evented:false,objectCaching:false});
   c.overlayImage=new fabric.Image(L.overlay,{excludeFromExport:true,selectable:false,evented:false,objectCaching:false,globalCompositeOperation:"multiply"});
   applyClip(); positionGuide(); c.requestRenderAll(); }
@@ -1154,9 +1193,10 @@ async function redo(){ const h=ED.hist[ED.side]; if(!h.r.length) return; const s
 
 async function openEditor(tpl){
   try{ await loadFabric(); }catch{ toast("Non riesco a caricare l'editor: controlla la connessione internet"); return; }
+  await loadPhotos();
   $("#stGallery").hidden=true; $("#stEditor").hidden=false; ED.open=true;
   initCanvas();
-  Object.assign(ED,{templateId:tpl.id||null,createdAt:tpl.createdAt||null,name:tpl.name||"Nuovo template",style:STYLES[tpl.style]?tpl.style:"classica",color:/^#[0-9a-f]{6}$/i.test(tpl.color||"")?tpl.color:"#f4f4f1",colorName:tpl.colorName||"Bianco",fabric:FABRICS[tpl.fabric]?tpl.fabric:"cotone",technique:TECHNIQUES.includes(tpl.technique)?tpl.technique:"Serigrafia",noSeams:!!tpl.noSeams,
+  Object.assign(ED,{templateId:tpl.id||null,createdAt:tpl.createdAt||null,name:tpl.name||"Nuovo template",style:STYLES[tpl.style]?tpl.style:"classica",color:/^#[0-9a-f]{6}$/i.test(tpl.color||"")?tpl.color:"#f4f4f1",colorName:tpl.colorName||"Bianco",fabric:FABRICS[tpl.fabric]?tpl.fabric:"cotone",technique:TECHNIQUES.includes(tpl.technique)?tpl.technique:"Serigrafia",noSeams:!!tpl.noSeams,render:tpl.render==="draw"?"draw":"photo",
     sides:{front:tpl.front||[],back:tpl.back||[]},side:"front",hist:{front:{u:[],r:[]},back:{u:[],r:[]}},zoom:1});
   $("#edName").value=ED.name; $("#brushColor").value=inkDefault();
   ED.canvas.isDrawingMode=false; updateBrushBtn();
@@ -1176,6 +1216,8 @@ function renderShirtPanel(){
   const fb=FABRICS[ED.fabric]; $("#edFabric").innerHTML=fabricOptions(ED.fabric);
   $("#edFabricInfo").innerHTML=`${esc(fb.note)}<br>Tecniche adatte: <b>${esc(fb.print.join(", "))}</b>`;
   $("#edTech").innerHTML=techOptions(ED.technique); $("#edSeams").checked=!ED.noSeams;
+  const isPh=styleOf(ED.style,ED.render).isPhoto; $("#edSeams").disabled=!!isPh; $("#edSeamsNote").hidden=!isPh;
+  document.querySelectorAll("[data-render]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.render===ED.render));
   const tw=techWarning(ED.fabric,ED.technique,ED.color); const w=$("#edTechWarn"); w.textContent=tw.text; w.className=tw.warn?"warnmsg":"note"; w.style.margin="0";
   positionGuide(); }
 function setShirtColor(hex,name){ ED.color=hex; ED.colorName=name; ED.dirty=true; applyShirt(); renderShirtPanel(); }
@@ -1351,9 +1393,9 @@ async function saveTemplate(asCopy){
   const btn=$("#edSave"); btn.disabled=true; btn.textContent="Salvo…";
   try{
     ED.sides[ED.side]=objsJSON(); ED.name=$("#edName").value.trim()||"Senza nome";
-    const thumb=await renderMock(ED.style,ED.color,"front",ED.sides.front,300,null,ED.fabric,ED.noSeams);
+    const thumb=await renderMock(ED.style,ED.color,"front",ED.sides.front,300,null,ED.fabric,ED.noSeams,ED.render);
     const now=new Date().toISOString();
-    const body={name:asCopy?ED.name+" (copia)":ED.name,style:ED.style,color:ED.color,colorName:ED.colorName,fabric:ED.fabric,technique:ED.technique,noSeams:!!ED.noSeams,front:ED.sides.front,back:ED.sides.back,thumb,updatedAt:now};
+    const body={name:asCopy?ED.name+" (copia)":ED.name,style:ED.style,color:ED.color,colorName:ED.colorName,fabric:ED.fabric,technique:ED.technique,noSeams:!!ED.noSeams,render:ED.render,front:ED.sides.front,back:ED.sides.back,thumb,updatedAt:now};
     if(JSON.stringify(body).length>250000) throw {code:"too_big"};
     if(ED.templateId&&!asCopy){ body.createdAt=ED.createdAt||now; await withRetry(()=>db.doc("templates/"+ED.templateId).set(body)); }
     else { body.createdAt=now; const ref=db.collection("templates").doc(); await withRetry(()=>ref.set(body)); ED.templateId=ref.id; ED.createdAt=now; ED.name=body.name; $("#edName").value=body.name; }
@@ -1392,11 +1434,11 @@ async function templateToStock(){
   if(!ED.templateId||ED.dirty){ const ok=await saveTemplate(false); if(!ok) return; }
   const btn=$("#edToStock"); btn.disabled=true;
   try{
-    const url=await renderMock(ED.style,ED.color,"front",ED.sides.front,S.local?480:900,null,ED.fabric,ED.noSeams);
+    const url=await renderMock(ED.style,ED.color,"front",ED.sides.front,S.local?480:900,null,ED.fabric,ED.noSeams,ED.render);
     const linked=S.designs.find(d=>d.templateId===ED.templateId);
     let imageId=null, imageData=null;
     if(assets&&!S.local){ try{ imageId=(await assets.upload(dataURLtoBlob(url))).id; }catch{} }
-    if(!imageId) imageData=S.local?url:await renderMock(ED.style,ED.color,"front",ED.sides.front,360,null,ED.fabric,ED.noSeams);
+    if(!imageId) imageData=S.local?url:await renderMock(ED.style,ED.color,"front",ED.sides.front,360,null,ED.fabric,ED.noSeams,ED.render);
     const img=imageId?{imageId,imageData:null}:{imageData,imageId:null};
     if(linked){ await withRetry(()=>db.doc("designs/"+linked.id).update({shirtColor:ED.colorName,color:ED.color,fabric:ED.fabric,technique:ED.technique,...img})); toast(`Immagine di "${linked.name}" aggiornata`); }
     else { const body={name:ED.name,code:"",status:"bozza",shirtColor:ED.colorName,color:ED.color,fabric:ED.fabric,technique:ED.technique,price:null,notes:`Creata dallo Studio (${STYLES[ED.style].label}, ${FABRICS[ED.fabric].label}, ${ED.technique})`,templateId:ED.templateId,createdAt:new Date().toISOString(),...img};
@@ -1404,8 +1446,8 @@ async function templateToStock(){
   }catch(e){ toast(errText(e)); } finally{ btn.disabled=false; } }
 
 /* ---------- vista 3D ---------- */
-function shirtGeometry(style){
-  const st=STYLES[style]||STYLES.classica, P=stylePaths(st);
+function shirtGeometry(style,rm){
+  const st=styleOf(style,rm), P=stylePaths(st);
   // sagoma misurata a 2 px per colonna/riga
   const R=2, GW=Math.ceil(SW/R), GH=Math.ceil(SH/R);
   const mc=document.createElement("canvas"); mc.width=GW; mc.height=GH; const mx=mc.getContext("2d"); mx.setTransform(1/R,0,0,1/R,0,0); mx.fill(P.body);
@@ -1482,8 +1524,8 @@ function shirtGeometry(style){
   const geo=new THREE.BufferGeometry(); geo.setAttribute("position",new THREE.Float32BufferAttribute(pos,3)); geo.setAttribute("uv",new THREE.Float32BufferAttribute(uv,2));
   geo.setIndex(groups[0].concat(groups[1])); geo.addGroup(0,groups[0].length,0); geo.addGroup(groups[0].length,groups[1].length,1); geo.computeVertexNormals(); return geo; }
 function loadImg(src){ return new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>res(im); im.onerror=rej; im.src=src; }); }
-function shirtTexture(img,style,color){ const c=document.createElement("canvas"); c.width=img.width; c.height=img.height; const x=c.getContext("2d"); const k=img.width/SW;
-  x.fillStyle=color; x.fillRect(0,0,c.width,c.height); x.save(); x.scale(k,k); x.clip(stylePaths(STYLES[style]||STYLES.classica).body); x.scale(1/k,1/k); x.drawImage(img,0,0); x.restore();
+function shirtTexture(img,style,color,rm){ const c=document.createElement("canvas"); c.width=img.width; c.height=img.height; const x=c.getContext("2d"); const k=img.width/SW;
+  x.fillStyle=color; x.fillRect(0,0,c.width,c.height); x.save(); x.scale(k,k); x.clip(stylePaths(styleOf(style,rm)).body); x.scale(1/k,1/k); x.drawImage(img,0,0); x.restore();
   const t=new THREE.CanvasTexture(c); t.encoding=THREE.sRGBEncoding; t.anisotropy=8; return t; }
 async function open3D(spec){
   let alive=true, raf=0, renderer=null, ro=null; const disposables=[];
@@ -1500,7 +1542,7 @@ async function open3D(spec){
   try{ await Promise.all([loadFabric(),loadLib("THREE",THREE_URL)]); }catch{ if(alive) load.textContent="Non riesco a caricare il visualizzatore 3D: controlla la connessione."; return; }
   if(!alive) return;
   let fImg,bImg;
-  try{ [fImg,bImg]=await Promise.all([renderMock(spec.style,spec.color,"front",spec.front||[],1200,null,spec.fabric,spec.noSeams),renderMock(spec.style,spec.color,"back",spec.back||[],1200,null,spec.fabric,spec.noSeams)].map(p=>p.then(loadImg))); }
+  try{ [fImg,bImg]=await Promise.all([renderMock(spec.style,spec.color,"front",spec.front||[],1200,null,spec.fabric,spec.noSeams,spec.render),renderMock(spec.style,spec.color,"back",spec.back||[],1200,null,spec.fabric,spec.noSeams,spec.render)].map(p=>p.then(loadImg))); }
   catch(e){ console.warn(e); if(alive) load.textContent="Non riesco a preparare le immagini del modello."; return; }
   if(!alive) return;
   const canvas=$("#v3Canvas"), stage=$("#v3Stage");
@@ -1511,7 +1553,7 @@ async function open3D(spec){
   scene.add(new THREE.HemisphereLight(0xffffff,0x80808a,.42));
   const key=new THREE.DirectionalLight(0xffffff,.62); key.position.set(450,650,1000); scene.add(key);
   const rim=new THREE.DirectionalLight(0xffffff,.28); rim.position.set(-600,300,-900); scene.add(rim);
-  const geo=shirtGeometry(spec.style); const tf=shirtTexture(fImg,spec.style,spec.color), tb=shirtTexture(bImg,spec.style,spec.color);
+  const geo=shirtGeometry(spec.style,spec.render); const tf=shirtTexture(fImg,spec.style,spec.color,spec.render), tb=shirtTexture(bImg,spec.style,spec.color,spec.render);
   const mats=[new THREE.MeshStandardMaterial({map:tf,roughness:(FABRICS[spec.fabric]||FABRICS.cotone).rough,metalness:0,side:THREE.FrontSide}),new THREE.MeshStandardMaterial({map:tb,roughness:(FABRICS[spec.fabric]||FABRICS.cotone).rough,metalness:0,side:THREE.FrontSide})];
   disposables.push(geo,tf,tb,...mats);
   const shirt=new THREE.Mesh(geo,mats); const grp=new THREE.Group(); grp.add(shirt); scene.add(grp);
@@ -1538,11 +1580,11 @@ async function open3D(spec){
     grp.rotation.set(rotX,rotY,0); camera.position.set(0,20,dist); camera.lookAt(0,0,0); renderer.render(scene,camera); raf=requestAnimationFrame(tick); };
   tick();
 }
-function specFromEditor(){ ED.sides[ED.side]=objsJSON(); return {name:$("#edName").value.trim()||"Template",style:ED.style,color:ED.color,colorName:ED.colorName,fabric:ED.fabric,technique:ED.technique,noSeams:!!ED.noSeams,front:ED.sides.front,back:ED.sides.back}; }
+function specFromEditor(){ ED.sides[ED.side]=objsJSON(); return {name:$("#edName").value.trim()||"Template",style:ED.style,color:ED.color,colorName:ED.colorName,fabric:ED.fabric,technique:ED.technique,noSeams:!!ED.noSeams,render:ED.render,front:ED.sides.front,back:ED.sides.back}; }
 
 /* ---------- eventi studio ---------- */
 function studioShow(){ renderStudioGallery(); if(!ED.open){ $("#stGallery").hidden=false; $("#stEditor").hidden=true; }
-  loadFabric().then(()=>{ if(ED.open) fitCanvas(); genStarterThumbs(); }).catch(()=>toast("Non riesco a caricare lo Studio: controlla la connessione internet")); }
+  loadFabric().then(loadPhotos).then(()=>{ if(ED.open){ fitCanvas(); applyShirt(); } genStarterThumbs(); }).catch(()=>toast("Non riesco a caricare lo Studio: controlla la connessione internet")); }
 function guardDirty(fn){ if(ED.open&&ED.dirty) confirmBox("Uscire senza salvare?","Le modifiche al template aperto andranno perse.","Esci senza salvare",async()=>{ ED.dirty=false; await fn(); }); else fn(); }
 $("#stNew").onclick=()=>openEditor({name:"Nuovo template"});
 $("#edBack").onclick=()=>guardDirty(()=>closeEditor());
@@ -1576,6 +1618,7 @@ $("#stEditor").addEventListener("click",e=>{
   const lt=t.closest("[data-ltab]"); if(lt){ document.querySelectorAll("[data-ltab]").forEach(b=>b.setAttribute("aria-selected",b===lt)); document.querySelectorAll("[data-lpanel]").forEach(p=>p.hidden=p.dataset.lpanel!==lt.dataset.ltab); if(lt.dataset.ltab==="layers") renderLayers(); return; }
   const ad=t.closest("[data-add]"); if(ad){ addText(ad.dataset.add); return; }
   const sh=t.closest("[data-shape]"); if(sh){ addShape(sh.dataset.shape); return; }
+  const rnd=t.closest("[data-render]"); if(rnd){ ED.render=rnd.dataset.render; ED.dirty=true; applyShirt(); renderShirtPanel(); return; }
   const sty=t.closest("[data-style]"); if(sty){ ED.style=sty.dataset.style; ED.dirty=true; applyShirt(); renderShirtPanel(); renderProps(); return; }
   const col=t.closest("[data-color]"); if(col){ setShirtColor(col.dataset.color,col.dataset.cname); return; }
   const ly=t.closest("[data-ly]"); if(ly&&ED.canvas){ const c=ED.canvas, o=c.getObjects()[+ly.dataset.ly]; if(!o) return; const la=t.closest("[data-la]")?.dataset.la;

@@ -22,6 +22,17 @@ http.createServer((req, res) => {
     });
     return;
   }
+  // immagini delle maglie usate dal mockup (cartella models/, pubblicata con l'app)
+  const mod = url.match(/^\/models\/([\w.-]+\.(webp|png|json))$/i);
+  if (mod) {
+    fs.readFile(path.join(__dirname, "models", mod[1]), (err, buf) => {
+      if (err) { res.writeHead(404); return res.end("Non trovato"); }
+      const ext = mod[2].toLowerCase();
+      res.writeHead(200, { "Content-Type": ext === "json" ? "application/json" : "image/" + ext, "Cache-Control": "no-store" });
+      res.end(buf);
+    });
+    return;
+  }
   // foto di riferimento (cartella ref/, non pubblicata): servono per ricalcare le sagome
   const ref = url.match(/^\/ref\/([\w.-]+\.(jpe?g|png))$/i);
   if (ref) {
